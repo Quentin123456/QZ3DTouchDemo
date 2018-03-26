@@ -7,6 +7,7 @@
 //
 
 #import "AppDelegate.h"
+#import "QZTabBarController.h"
 
 @interface AppDelegate ()
 
@@ -16,8 +17,71 @@
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    
+    //1.创建窗口
+    self.window  = [[UIWindow alloc] initWithFrame:[UIScreen mainScreen].bounds];
+    self.window.rootViewController = [[QZTabBarController alloc] init];
+    [self.window makeKeyAndVisible];
+    
+    [self configShortCutItems];
+    
     // Override point for customization after application launch.
     return YES;
+}
+
+/** 创建shortcutItems */
+- (void)configShortCutItems {
+    
+    NSMutableArray *shortcutItems = [NSMutableArray array];
+    
+    UIApplicationShortcutItem *item1 = [[UIApplicationShortcutItem alloc]initWithType:@"QZ.UITouchText.home" localizedTitle:@"测试1" localizedSubtitle:nil icon:[UIApplicationShortcutIcon iconWithType:UIApplicationShortcutIconTypeHome] userInfo:nil];
+    
+    UIApplicationShortcutItem *item2 = [[UIApplicationShortcutItem alloc]initWithType:@"QZ.UITouchText.search" localizedTitle:@"测试2" localizedSubtitle:@"测试2副标题" icon:[UIApplicationShortcutIcon iconWithType:UIApplicationShortcutIconTypeSearch]
+                                                                             userInfo:nil];
+    [shortcutItems addObject:item2];
+    [shortcutItems addObject:item1];
+    [[UIApplication sharedApplication] setShortcutItems:shortcutItems];
+    
+}
+
+// iOS9 的 3D Touch
+- (void)application:(UIApplication *)application performActionForShortcutItem:(UIApplicationShortcutItem *)shortcutItem completionHandler:(void(^)(BOOL succeeded))completionHandler {
+    
+    if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 9.0 &&self.window.traitCollection.forceTouchCapability == UIForceTouchCapabilityAvailable) {
+        
+        QZLog(@"你的手机支持3D Touch!");
+        QZNetCountManager * sharedNetCountManager = [QZNetCountManager sharedNetCountManager];
+        sharedNetCountManager.applicationShortcutItemTitle = shortcutItem.type;
+        
+        //首页
+        if([shortcutItem.type isEqualToString:@"QZ.UITouchText.home"]) {
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"QZ.UITouchText.home" object:nil userInfo:nil];
+            
+        }
+        //搜索商品
+        if([shortcutItem.type isEqualToString:@"QZ.UITouchText.search"]) {
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"QZ.UITouchText.search" object:nil userInfo:nil];
+            
+        }
+        //购物车
+        if([shortcutItem.type isEqualToString:@"YPYD.UITouchText.cart"]) {
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"QZ.UITouchText.cart" object:nil userInfo:nil];
+            
+        }
+        //我的U
+        if([shortcutItem.type isEqualToString:@"QZ.UITouchText.myU"]) {
+            
+            [[NSNotificationCenter defaultCenter] postNotificationName:@"QZ.UITouchText.home"
+                                                                object:nil userInfo:nil];
+            
+        }
+    } else {
+      QZLog(@"你的手机暂不支持3D Touch!");
+    }
+    
 }
 
 
